@@ -24,15 +24,15 @@ public class UserController {
 	 //создание нового пользователя
 	@PostMapping
 	public User createUser(@Valid @RequestBody User user) {
-		log.info("Получен запрос на создание пользователя с логином: {}", user.getLogin());
+		log.info("Получен запрос на создание пользователя с логином: {}, именем: {}", user.getLogin(), user.getName());
 		validateUser(user);
-		// Если имя пустое, используем логин
+		// если имя пустое, используем логин
 		if (user.getName() == null || user.getName().isBlank()) {
 			user.setName(user.getLogin());
 		}
 		user.setId(nextId++);
 		users.put(user.getId(), user);
-		log.info("Пользователь успешно создан с id: {}", user.getId());
+		log.info("Пользователь  создан  id: {}", user.getId());
 		return user;
 	}
 
@@ -62,7 +62,7 @@ public class UserController {
 	}
 
 	//проверка email, логин и даты рождения
-	private void validateUser(User user) {
+	void validateUser(User user) {
 		if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
 			log.error("Ошибка валидации: email не может быть пустым и должен содержать символ @");
 			throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
