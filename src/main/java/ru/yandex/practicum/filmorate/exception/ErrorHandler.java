@@ -19,4 +19,11 @@ public class ErrorHandler {
 		log.error("Ошибка валидации: {}", e.getMessage());
 		return Map.of("error", "Ошибка валидации", "message", e.getMessage());
 	}
+
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public Map<String, String> handleNotFoundException(NotFoundException e) {
+		log.error("Объект не найден: {}", e.getMessage());
+		return Map.of("error", "Объект не найден", "message", e.getMessage());
+	}
 }
