@@ -13,89 +13,90 @@ class FilmControllerTest {
 
 	private FilmController filmController;
 	private Film validFilm;
-
+	private static final String FILM_DESCRIPTION = "Description";
+	private static final String FILM_NAME = "nisi eiusmod";
 	@BeforeEach
 	void setUp() {
 		filmController = new FilmController();
 		validFilm = new Film();
-		validFilm.setName("Test Film");
-		validFilm.setDescription("Test Description");
+		validFilm.setName(FILM_NAME);
+		validFilm.setDescription(FILM_DESCRIPTION);
 		validFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
 		validFilm.setDuration(120);
 	}
 
 	@Test
-	void createFilm_WithValidData_ReturnsCreatedFilm() {
+	void createFilmPositiveTest() {
 		Film result = filmController.createFilm(validFilm);
 		assertNotNull(result);
 		assertNotNull(result.getId());
-		assertEquals("Test Film", result.getName());
+		assertEquals(FILM_NAME, result.getName());
 	}
 
 	@Test
-	void createFilm_WithEmptyName_ThrowsException() {
+	void createFilm_EmptyNameNegativeTest() {
 		validFilm.setName("");
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithNullName_ThrowsException() {
+	void createFilm_NullNameTestNegativeTest() {
 		validFilm.setName(null);
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithDescriptionTooLong_ThrowsException() {
-		validFilm.setDescription("a".repeat(201));
+	void createFilm_LongDescriptionTest() {
+		validFilm.setDescription("Пятеро друзей ( комик-группа «Шарло»), приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова, который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия», стал кандидатом Коломбани.");
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithDescriptionExactly200Chars_ReturnsOk() {
+	void createFilm_Description200CharsTest() {
 		validFilm.setDescription("a".repeat(200));
 		Film result = filmController.createFilm(validFilm);
 		assertNotNull(result);
 	}
 
 	@Test
-	void createFilm_WithReleaseDateBeforeMinDate_ThrowsException() {
+	void createFilm_ReleaseDateBeforeMinDateTest() {
 		validFilm.setReleaseDate(LocalDate.of(1895, 12, 27));
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithReleaseDateMinDate_ReturnsOk() {
+	void createFilm_ReleaseDateMinDatePositiveTest() {
 		validFilm.setReleaseDate(LocalDate.of(1895, 12, 28));
 		Film result = filmController.createFilm(validFilm);
 		assertNotNull(result);
 	}
 
 	@Test
-	void createFilm_WithNullReleaseDate_ThrowsException() {
+	void createFilm_WithNullReleaseDateNegativeTest() {
 		validFilm.setReleaseDate(null);
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithNegativeDuration_ThrowsException() {
+	void createFilm_NegativeDurationNegativeTest() {
 		validFilm.setDuration(-1);
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithZeroDuration_ThrowsException() {
+	void createFilm_ZeroDurationNegativeTest() {
 		validFilm.setDuration(0);
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithNullDuration_ThrowsException() {
+	void createFilm_NullDurationNegativeTest() {
 		validFilm.setDuration(null);
 		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
 	}
 
 	@Test
-	void createFilm_WithEmptyRequest_ThrowsException() {
+	void createFilm_EmptyRequestNegativeTest() {
 		Film emptyFilm = new Film();
 		assertThrows(ValidationException.class, () -> filmController.createFilm(emptyFilm));
 	}
