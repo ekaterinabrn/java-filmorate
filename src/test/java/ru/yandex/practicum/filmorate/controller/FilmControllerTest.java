@@ -15,6 +15,7 @@ class FilmControllerTest {
 	private Film validFilm;
 	private static final String FILM_DESCRIPTION = "Description";
 	private static final String FILM_NAME = "nisi eiusmod";
+
 	@BeforeEach
 	void setUp() {
 		filmController = new FilmController();

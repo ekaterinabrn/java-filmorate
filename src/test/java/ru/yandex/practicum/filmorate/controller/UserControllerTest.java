@@ -17,7 +17,6 @@ class UserControllerTest {
 	private static final String USER_NAME = "Nick Name";
 	private static final String USER_EMAIL = "mail@mail.ru";
 
-
 	@BeforeEach
 	void setUp() {
 		userController = new UserController();

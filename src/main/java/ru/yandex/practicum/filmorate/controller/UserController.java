@@ -20,8 +20,7 @@ public class UserController {
 	private final Map<Integer, User> users = new HashMap<>();
 	private int nextId = 1;
 
-
-	 //создание нового пользователя
+	//создание нового пользователя
 	@PostMapping
 	public User createUser(@Valid @RequestBody User user) {
 		log.info("Получен запрос на создание пользователя с логином: {}, именем: {}", user.getLogin(), user.getName());
