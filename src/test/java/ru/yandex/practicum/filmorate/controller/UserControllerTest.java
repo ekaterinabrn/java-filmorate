@@ -100,7 +100,7 @@ class UserControllerTest {
 	}
 
 	@Test
-	void createUser_EmptyRequestNegativeTest() {
+	void createUserEmptyRequestNegativeTest() {
 		User emptyUser = new User();
 		assertThrows(ValidationException.class, () -> userController.createUser(emptyUser));
 	}
