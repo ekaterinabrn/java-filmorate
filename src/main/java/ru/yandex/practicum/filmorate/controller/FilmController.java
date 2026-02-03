@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ErrorHandler;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -41,7 +42,7 @@ public class FilmController {
 		log.info("Получен запрос на обновление фильма с id: {}", film.getId());
 		validateFilm(film);
 		if (film.getId() == null || !films.containsKey(film.getId())) {
-			log.error("Фильм с id {} не найден", film.getId());
+			log.error("{}: фильм с id {} не найден", ErrorHandler.NOT_FOUND_ERROR, film.getId());
 			throw new NotFoundException("Фильм с указанным id не найден");
 		}
 		films.put(film.getId(), film);
@@ -58,21 +59,21 @@ public class FilmController {
 
 
 	// проверка  названия, описания, даты релиза и продолжительность
-	void validateFilm(Film film) {
+	private void validateFilm(Film film) {
 		if (film.getName() == null || film.getName().isBlank()) {
-			log.error("Ошибка: название фильма не может быть пустым");
+			log.error("{}: название фильма не может быть пустым", ErrorHandler.VALIDATION_ERROR);
 			throw new ValidationException("Название фильма не может быть пустым");
 		}
 		if (film.getDescription() != null && film.getDescription().length() > 200) {
-			log.error("Ошибка: описание фильма превышает 200 символов");
+			log.error("{}: описание фильма превышает 200 символов", ErrorHandler.VALIDATION_ERROR);
 			throw new ValidationException("Максимальная длина описания — 200 символов");
 		}
 		if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
-			log.error("Ошибка: дата релиза должна быть не раньше {}", MIN_RELEASE_DATE);
+			log.error("{}: дата релиза должна быть не раньше {}", ErrorHandler.VALIDATION_ERROR, MIN_RELEASE_DATE);
 			throw new ValidationException("Дата релиза не раньше 28 декабря 1895 года");
 		}
 		if (film.getDuration() == null || film.getDuration() <= 0) {
-			log.error("Ошибка: продолжительность фильма должна быть положительным числом");
+			log.error("{}: продолжительность фильма должна быть положительным числом", ErrorHandler.VALIDATION_ERROR);
 			throw new ValidationException("Продолжительность фильма должна быть положительным числом");
 		}
 	}

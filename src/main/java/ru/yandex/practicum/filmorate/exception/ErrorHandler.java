@@ -12,18 +12,20 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
+	public static final String VALIDATION_ERROR = "Ошибка валидации";
+	public static final String NOT_FOUND_ERROR = "Объект не найден";
 
 	@ExceptionHandler(ValidationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public Map<String, String> handleValidationException(ValidationException e) {
-		log.error("Ошибка валидации: {}", e.getMessage());
-		return Map.of("error", "Ошибка валидации", "message", e.getMessage());
+		log.error("{}: {}", VALIDATION_ERROR, e.getMessage());
+		return Map.of("error", VALIDATION_ERROR, "message", e.getMessage());
 	}
 
 	@ExceptionHandler(NotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public Map<String, String> handleNotFoundException(NotFoundException e) {
-		log.error("Объект не найден: {}", e.getMessage());
-		return Map.of("error", "Объект не найден", "message", e.getMessage());
+		log.error("{}: {}", NOT_FOUND_ERROR, e.getMessage());
+		return Map.of("error", NOT_FOUND_ERROR, "message", e.getMessage());
 	}
 }
