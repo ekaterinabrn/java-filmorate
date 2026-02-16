@@ -24,7 +24,7 @@ public class UserService {
 	private static final String USER_NOT_FOUND_MESSAGE = "Пользователь с id ";
 	private static final String USER_ADDED_FRIEND = "Пользователь с id {} добавил в друзья пользователя с id {}";
 	private static final String USER_REMOVED_FRIEND = "Пользователь с id {} удалил из друзей пользователя с id {}";
-	
+
 	private final UserStorage userStorage;
 
 
@@ -146,7 +146,7 @@ public class UserService {
 
 		Set<Long> userFriends = user.getFriends();
 		Set<Long> otherFriends = other.getFriends();
-		log.trace("У пользователя {} друзей: {}, у пользователя {} друзей: {}", 
+		log.trace("У пользователя {} друзей: {}, у пользователя {} друзей: {}",
 				userId, userFriends.size(), otherId, otherFriends.size());
 
 		// находим пересечение множеств друзей
