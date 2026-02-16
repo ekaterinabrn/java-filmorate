@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Data
@@ -11,4 +14,6 @@ public class User {
 	private String login;
 	private String name;
 	private LocalDate birthday;
+	// Чтобы обеспечить уникальность значения (нельзя добавить одного человека в друзья дважды)
+	private Set<Long> friends = new HashSet<>();
 }
