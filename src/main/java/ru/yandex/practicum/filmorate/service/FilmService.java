@@ -37,17 +37,17 @@ public class FilmService {
 	//создать новый фильм
 
 	public Film createFilm(Film film) {
-		log.debug("Начинаем создание фильма: {}", film.getName());
+		log.debug("Создаем фильм: {}", film.getName());
 		validateFilm(film);
 		Film createdFilm = filmStorage.addFilm(film);
-		log.debug("Фильм успешно создан с id: {}", createdFilm.getId());
+		log.debug("Фильм создан  id: {}", createdFilm.getId());
 		return createdFilm;
 	}
 
 	//обновить  фильм
 
 	public Film updateFilm(Film film) {
-		log.debug("Начинаем обновление фильма с id: {}", film.getId());
+		log.debug("Обновляем фильм с id: {}", film.getId());
 		validateFilm(film);
 		if (film.getId() == null || filmStorage.getFilmById(film.getId()) == null) {
 			log.warn("Попытка обновить несуществующий фильм с id: {}", film.getId());
@@ -61,7 +61,7 @@ public class FilmService {
 	//получить фильм по идентификатору
 
 	public Film getFilmById(Integer id) {
-		log.trace("Получаем фильм с id: {}", id);
+		log.trace("Ищем фильм с id: {}", id);
 		Film film = filmStorage.getFilmById(id);
 		if (film == null) {
 			log.warn(FILM_NOT_FOUND, id);
@@ -83,7 +83,7 @@ public class FilmService {
 	//добавлить лайк фильму от пользователя
 
 	public void addLike(Integer filmId, Integer userId) {
-		log.debug("Начинаем добавление лайка: пользователь {} ставит лайк фильму {}", userId, filmId);
+		log.debug("Добавляем лайк: пользователь {} ставит лайк фильму {}", userId, filmId);
 		Film film = getFilmById(filmId);
 		if (userStorage.getUserById(userId) == null) {
 			log.warn("Попытка поставить лайк от несуществующего пользователя с id: {}", userId);
@@ -98,7 +98,7 @@ public class FilmService {
 	//удалить лайк фильма
 
 	public void removeLike(Integer filmId, Integer userId) {
-		log.debug("Начинаем удаление лайка: пользователь {} удаляет лайк фильму {}", userId, filmId);
+		log.debug("Удаляем лайк: пользователь {} удаляет лайк фильму {}", userId, filmId);
 		Film film = getFilmById(filmId);
 		if (userStorage.getUserById(userId) == null) {
 			log.warn("Попытка удалить лайк от несуществующего пользователя с id: {}", userId);
@@ -114,7 +114,7 @@ public class FilmService {
 
 	public List<Film> getPopularFilms(Integer count) {
 		int limit = (count == null || count <= 0) ? 10 : count;
-		log.debug("Получаем список популярных фильмов, запрошено: {}", limit);
+		log.debug("Получаем список популярных фильмов: {}", limit);
 		List<Film> allFilms = filmStorage.getAllFilms();
 		log.trace("Всего фильмов в хранилище: {}", allFilms.size());
 		List<Film> popularFilms = allFilms.stream()
@@ -129,7 +129,7 @@ public class FilmService {
 	//валидация данных фильма
 
 	private void validateFilm(Film film) {
-		log.trace("Начинаем валидацию фильма: {}", film.getName());
+		log.trace("Проверка валидации фильма: {}", film.getName());
 		if (film.getName() == null || film.getName().isBlank()) {
 			log.error(VALIDATION_ERROR_PREFIX + "название фильма не может быть пустым");
 			throw new ValidationException("Название фильма не может быть пустым");

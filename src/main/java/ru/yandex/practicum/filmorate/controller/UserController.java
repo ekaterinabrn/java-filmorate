@@ -45,7 +45,7 @@ public class UserController {
 
 	@GetMapping
 	public List<User> getAllUsers() {
-		log.info("Получен запрос на получение всех пользователей");
+		log.info("Получен запрос на получение списка всех пользователей");
 		return userService.getAllUsers();
 	}
 
