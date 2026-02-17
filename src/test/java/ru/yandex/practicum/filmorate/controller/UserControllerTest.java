@@ -33,7 +33,7 @@ class UserControllerTest {
 
 	@Test
 	void createUser_WithValidData_ReturnsCreatedUser() {
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertNotNull(result);
 		assertNotNull(result.getId());
 		assertEquals(USER_EMAIL, result.getEmail());
@@ -78,14 +78,14 @@ class UserControllerTest {
 	@Test
 	void createUser_WithEmptyNamePositiveTest() {
 		validUser.setName("");
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertEquals(USER_LOGIN, result.getName());
 	}
 
 	@Test
 	void createUser_UsesLoginAsNamePositiveTest() {
 		validUser.setName(null);
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertEquals(USER_LOGIN, result.getName());
 	}
 
@@ -98,7 +98,7 @@ class UserControllerTest {
 	@Test
 	void createUser_TodayBirthdayPositiveTest() {
 		validUser.setBirthday(LocalDate.now());
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertNotNull(result);
 	}
 

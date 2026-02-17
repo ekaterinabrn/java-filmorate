@@ -33,7 +33,7 @@ class FilmControllerTest {
 
 	@Test
 	void createFilmPositiveTest() {
-		Film result = filmController.createFilm(validFilm);
+		Film result = filmController.createFilm(validFilm).getBody();
 		assertNotNull(result);
 		assertNotNull(result.getId());
 		assertEquals(FILM_NAME, result.getName());
@@ -60,7 +60,7 @@ class FilmControllerTest {
 	@Test
 	void createFilm_Description200CharsTest() {
 		validFilm.setDescription("a".repeat(200));
-		Film result = filmController.createFilm(validFilm);
+		Film result = filmController.createFilm(validFilm).getBody();
 		assertNotNull(result);
 	}
 
@@ -73,7 +73,7 @@ class FilmControllerTest {
 	@Test
 	void createFilm_ReleaseDateMinDatePositiveTest() {
 		validFilm.setReleaseDate(LocalDate.of(1895, 12, 28));
-		Film result = filmController.createFilm(validFilm);
+		Film result = filmController.createFilm(validFilm).getBody();
 		assertNotNull(result);
 	}
 
