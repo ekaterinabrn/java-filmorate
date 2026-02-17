@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -18,7 +21,9 @@ class FilmControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		filmController = new FilmController();
+		//создаем хранилище и сервис до создания контроллерв
+		FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
+		filmController = new FilmController(filmService);
 		validFilm = new Film();
 		validFilm.setName(FILM_NAME);
 		validFilm.setDescription(FILM_DESCRIPTION);
@@ -28,7 +33,7 @@ class FilmControllerTest {
 
 	@Test
 	void createFilmPositiveTest() {
-		Film result = filmController.createFilm(validFilm);
+		Film result = filmController.createFilm(validFilm).getBody();
 		assertNotNull(result);
 		assertNotNull(result.getId());
 		assertEquals(FILM_NAME, result.getName());
@@ -55,7 +60,7 @@ class FilmControllerTest {
 	@Test
 	void createFilm_Description200CharsTest() {
 		validFilm.setDescription("a".repeat(200));
-		Film result = filmController.createFilm(validFilm);
+		Film result = filmController.createFilm(validFilm).getBody();
 		assertNotNull(result);
 	}
 
@@ -68,7 +73,7 @@ class FilmControllerTest {
 	@Test
 	void createFilm_ReleaseDateMinDatePositiveTest() {
 		validFilm.setReleaseDate(LocalDate.of(1895, 12, 28));
-		Film result = filmController.createFilm(validFilm);
+		Film result = filmController.createFilm(validFilm).getBody();
 		assertNotNull(result);
 	}
 

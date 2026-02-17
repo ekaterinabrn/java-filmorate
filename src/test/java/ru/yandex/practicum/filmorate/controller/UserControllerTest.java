@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -19,7 +21,9 @@ class UserControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		userController = new UserController();
+		//создаем хранилище и сервис до создания контроллерв
+		UserService userService = new UserService(new InMemoryUserStorage());
+		userController = new UserController(userService);
 		validUser = new User();
 		validUser.setEmail(USER_EMAIL);
 		validUser.setLogin(USER_LOGIN);
@@ -29,7 +33,7 @@ class UserControllerTest {
 
 	@Test
 	void createUser_WithValidData_ReturnsCreatedUser() {
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertNotNull(result);
 		assertNotNull(result.getId());
 		assertEquals(USER_EMAIL, result.getEmail());
@@ -74,14 +78,14 @@ class UserControllerTest {
 	@Test
 	void createUser_WithEmptyNamePositiveTest() {
 		validUser.setName("");
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertEquals(USER_LOGIN, result.getName());
 	}
 
 	@Test
 	void createUser_UsesLoginAsNamePositiveTest() {
 		validUser.setName(null);
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertEquals(USER_LOGIN, result.getName());
 	}
 
@@ -94,7 +98,7 @@ class UserControllerTest {
 	@Test
 	void createUser_TodayBirthdayPositiveTest() {
 		validUser.setBirthday(LocalDate.now());
-		User result = userController.createUser(validUser);
+		User result = userController.createUser(validUser).getBody();
 		assertNotNull(result);
 	}
 
