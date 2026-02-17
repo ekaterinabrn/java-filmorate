@@ -16,6 +16,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+	private static final int DEFAULT_POPULAR_FILMS_LIMIT = 10;
+
 	private final FilmService filmService;
 
 
@@ -77,7 +79,7 @@ public class FilmController {
 	//список самых популярных фильмов по количеству лайков
 	@GetMapping("/popular")
 	public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(required = false) Integer count) {
-		log.info("Получен запрос на получение популярных фильмов, количество: {}", count != null ? count : 10);
+		log.info("Получен запрос на получение популярных фильмов, количество: {}", count != null ? count : DEFAULT_POPULAR_FILMS_LIMIT);
 		return ResponseEntity.ok(filmService.getPopularFilms(count));
 	}
 }

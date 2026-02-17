@@ -24,6 +24,13 @@ public class FilmService {
 	private static final String FILM_NOT_FOUND_MESSAGE = "Фильм с id ";
 	private static final String USER_NOT_FOUND_MESSAGE = "Пользователь с id ";
 
+	private static final int DEFAULT_POPULAR_FILMS_LIMIT = 10;
+	private static final int MAX_FILM_DESCRIPTION_LENGTH = 200;
+	private static final int MIN_RELEASE_YEAR = 1895;
+	private static final int MIN_RELEASE_MONTH = 12;
+	private static final int MIN_RELEASE_DAY = 28;
+	private static final int MIN_DURATION_VALUE = 0;
+
 	private final FilmStorage filmStorage;
 	private final UserStorage userStorage;
 
@@ -103,7 +110,7 @@ public class FilmService {
 	//список самых популярных фильмов по количеству лайков
 
 	public List<Film> getPopularFilms(Integer count) {
-		int limit = (count == null || count <= 0) ? 10 : count;
+		int limit = (count == null || count <= MIN_DURATION_VALUE) ? DEFAULT_POPULAR_FILMS_LIMIT : count;
 		log.debug("Получаем список популярных фильмов: {}", limit);
 		List<Film> popularFilms = filmStorage.getAllFilms().stream()
 				.sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
@@ -119,16 +126,16 @@ public class FilmService {
 			log.error(VALIDATION_ERROR_PREFIX + "название фильма не может быть пустым");
 			throw new ValidationException("Название фильма не может быть пустым");
 		}
-		if (film.getDescription() != null && film.getDescription().length() > 200) {
-			log.error(VALIDATION_ERROR_PREFIX + "описание фильма превышает 200 символов");
-			throw new ValidationException("Максимальная длина описания — 200 символов");
+		if (film.getDescription() != null && film.getDescription().length() > MAX_FILM_DESCRIPTION_LENGTH) {
+			log.error(VALIDATION_ERROR_PREFIX + "описание фильма превышает {} символов", MAX_FILM_DESCRIPTION_LENGTH);
+			throw new ValidationException("Максимальная длина описания — " + MAX_FILM_DESCRIPTION_LENGTH + " символов");
 		}
-		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
+		LocalDate minReleaseDate = LocalDate.of(MIN_RELEASE_YEAR, MIN_RELEASE_MONTH, MIN_RELEASE_DAY);
 		if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(minReleaseDate)) {
 			log.error(VALIDATION_ERROR_PREFIX + "дата релиза должна быть не раньше {}", minReleaseDate);
-			throw new ValidationException("Дата релиза не раньше 28 декабря 1895 года");
+			throw new ValidationException("Дата релиза не раньше " + MIN_RELEASE_DAY + " декабря " + MIN_RELEASE_YEAR + " года");
 		}
-		if (film.getDuration() == null || film.getDuration() <= 0) {
+		if (film.getDuration() == null || film.getDuration() <= MIN_DURATION_VALUE) {
 			log.error(VALIDATION_ERROR_PREFIX + "продолжительность фильма должна быть положительным числом");
 			throw new ValidationException("Продолжительность фильма должна быть положительным числом");
 		}
