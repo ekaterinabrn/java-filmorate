@@ -22,8 +22,6 @@ public class UserService {
 	private static final String VALIDATION_ERROR_PREFIX = "Ошибка валидации: ";
 	private static final String USER_NOT_FOUND = "Пользователь с id {} не найден";
 	private static final String USER_NOT_FOUND_MESSAGE = "Пользователь с id ";
-	private static final String USER_ADDED_FRIEND = "Пользователь с id {} добавил в друзья пользователя с id {}";
-	private static final String USER_REMOVED_FRIEND = "Пользователь с id {} удалил из друзей пользователя с id {}";
 
 	private final UserStorage userStorage;
 
@@ -67,13 +65,11 @@ public class UserService {
 
 
 	public User getUserById(Integer id) {
-		log.trace("Получаем пользователя с id: {}", id);
 		User user = userStorage.getUserById(id);
 		if (user == null) {
 			log.warn(USER_NOT_FOUND, id);
 			throw new NotFoundException(USER_NOT_FOUND_MESSAGE + id + " не найден");
 		}
-		log.trace("Пользователь с id {} найден: {}", id, user.getLogin());
 		return user;
 	}
 
@@ -81,9 +77,7 @@ public class UserService {
 
 	public List<User> getAllUsers() {
 		log.debug("Получаем список всех пользователей");
-		List<User> users = userStorage.getAllUsers();
-		log.trace("Найдено пользователей: {}", users.size());
-		return users;
+		return userStorage.getAllUsers();
 	}
 
 	//добавить пользователя в друзья другому пользователю
@@ -92,16 +86,8 @@ public class UserService {
 		log.debug("Начинаем добавление в друзья: пользователь {} добавляет пользователя {}", userId, friendId);
 		User user = getUserById(userId);
 		User friend = getUserById(friendId);
-
-		log.trace("Текущее количество друзей у пользователя {}: {}", userId, user.getFriends().size());
-		log.trace("Текущее количество друзей у пользователя {}: {}", friendId, friend.getFriends().size());
-
 		user.getFriends().add(friendId.longValue());
 		friend.getFriends().add(userId.longValue());
-
-		log.info(USER_ADDED_FRIEND, userId, friendId);
-		log.trace("Количество друзей после добавления у пользователя {}: {}", userId, user.getFriends().size());
-		log.trace("Количество друзей после добавления у пользователя {}: {}", friendId, friend.getFriends().size());
 	}
 
 	//удалить пользователя из друзей другого пользователя
@@ -110,16 +96,8 @@ public class UserService {
 		log.debug("Начинаем удаление из друзей: пользователь {} удаляет пользователя {}", userId, friendId);
 		User user = getUserById(userId);
 		User friend = getUserById(friendId);
-
-		log.trace("Текущее количество друзей у пользователя {}: {}", userId, user.getFriends().size());
-		log.trace("Текущее количество друзей у пользователя {}: {}", friendId, friend.getFriends().size());
-
 		user.getFriends().remove(friendId.longValue());
 		friend.getFriends().remove(userId.longValue());
-
-		log.info(USER_REMOVED_FRIEND, userId, friendId);
-		log.trace("Количество друзей после удаления у пользователя {}: {}", userId, user.getFriends().size());
-		log.trace("Количество друзей после удаления у пользователя {}: {}", friendId, friend.getFriends().size());
 	}
 
 	//список друзей пользователя
@@ -127,13 +105,10 @@ public class UserService {
 	public List<User> getFriends(Integer userId) {
 		log.debug("Получаем список друзей пользователя с id: {}", userId);
 		User user = getUserById(userId);
-		log.trace("У пользователя {} найдено друзей: {}", userId, user.getFriends().size());
 		List<User> friends = new ArrayList<>();
 		for (Long friendId : user.getFriends()) {
-			log.trace("Обрабатываем друга с id: {}", friendId);
 			friends.add(getUserById(friendId.intValue()));
 		}
-		log.debug("Список друзей пользователя {} успешно получен, количество: {}", userId, friends.size());
 		return friends;
 	}
 
@@ -146,29 +121,22 @@ public class UserService {
 
 		Set<Long> userFriends = user.getFriends();
 		Set<Long> otherFriends = other.getFriends();
-		log.trace("У пользователя {} друзей: {}, у пользователя {} друзей: {}",
-				userId, userFriends.size(), otherId, otherFriends.size());
 
 		// находим пересечение множеств друзей
 		Set<Long> commonFriendIds = userFriends.stream()
 				.filter(otherFriends::contains)
 				.collect(Collectors.toSet());
 
-		log.trace("Найдено общих друзей: {}", commonFriendIds.size());
-
 		List<User> commonFriends = new ArrayList<>();
 		for (Long friendId : commonFriendIds) {
-			log.trace("Обрабатываем общего друга с id: {}", friendId);
 			commonFriends.add(getUserById(friendId.intValue()));
 		}
-		log.debug("Список общих друзей успешно получен, количество: {}", commonFriends.size());
 		return commonFriends;
 	}
 
 	//валидация данных пользователя
 
 	private void validateUser(User user) {
-		log.trace("Проверка валидации пользователя с логином: {}", user.getLogin());
 		if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
 			log.error(VALIDATION_ERROR_PREFIX + "email не может быть пустым и должен содержать символ @");
 			throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
@@ -181,6 +149,5 @@ public class UserService {
 			log.error(VALIDATION_ERROR_PREFIX + "дата рождения не может быть в будущем");
 			throw new ValidationException("Дата рождения не может быть в будущем");
 		}
-		log.trace("Валидация пользователя пройдена успешно");
 	}
 }

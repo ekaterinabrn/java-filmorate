@@ -61,13 +61,11 @@ public class FilmService {
 	//получить фильм по идентификатору
 
 	public Film getFilmById(Integer id) {
-		log.trace("Ищем фильм с id: {}", id);
 		Film film = filmStorage.getFilmById(id);
 		if (film == null) {
 			log.warn(FILM_NOT_FOUND, id);
 			throw new NotFoundException(FILM_NOT_FOUND_MESSAGE + id + " не найден");
 		}
-		log.trace("Фильм с id {} найден: {}", id, film.getName());
 		return film;
 	}
 
@@ -75,9 +73,7 @@ public class FilmService {
 
 	public List<Film> getAllFilms() {
 		log.debug("Получаем список всех фильмов");
-		List<Film> films = filmStorage.getAllFilms();
-		log.trace("Найдено фильмов: {}", films.size());
-		return films;
+		return filmStorage.getAllFilms();
 	}
 
 	//добавлить лайк фильму от пользователя
@@ -89,10 +85,7 @@ public class FilmService {
 			log.warn("Попытка поставить лайк от несуществующего пользователя с id: {}", userId);
 			throw new NotFoundException(USER_NOT_FOUND_MESSAGE + userId + " не найден");
 		}
-		log.trace("Текущее количество лайков у фильма {}: {}", filmId, film.getLikes().size());
 		film.getLikes().add(userId.longValue());
-		log.info("Пользователь с id {} поставил лайк фильму с id {}", userId, filmId);
-		log.trace("Количество лайков после добавления у фильма {}: {}", filmId, film.getLikes().size());
 	}
 
 	//удалить лайк фильма
@@ -104,10 +97,7 @@ public class FilmService {
 			log.warn("Попытка удалить лайк от несуществующего пользователя с id: {}", userId);
 			throw new NotFoundException(USER_NOT_FOUND_MESSAGE + userId + " не найден");
 		}
-		log.trace("Текущее количество лайков у фильма {}: {}", filmId, film.getLikes().size());
 		film.getLikes().remove(userId.longValue());
-		log.info("Пользователь с id {} удалил лайк фильму с id {}", userId, filmId);
-		log.trace("Количество лайков после удаления у фильма {}: {}", filmId, film.getLikes().size());
 	}
 
 	//список самых популярных фильмов по количеству лайков
@@ -115,21 +105,16 @@ public class FilmService {
 	public List<Film> getPopularFilms(Integer count) {
 		int limit = (count == null || count <= 0) ? 10 : count;
 		log.debug("Получаем список популярных фильмов: {}", limit);
-		List<Film> allFilms = filmStorage.getAllFilms();
-		log.trace("Всего фильмов в хранилище: {}", allFilms.size());
-		List<Film> popularFilms = allFilms.stream()
+		List<Film> popularFilms = filmStorage.getAllFilms().stream()
 				.sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
 				.limit(limit)
 				.collect(Collectors.toList());
-		log.debug("Получен список популярных фильмов , количество: {}", popularFilms.size());
-		log.trace("Популярные фильмы отсортированы по количеству лайков");
 		return popularFilms;
 	}
 
 	//валидация данных фильма
 
 	private void validateFilm(Film film) {
-		log.trace("Проверка валидации фильма: {}", film.getName());
 		if (film.getName() == null || film.getName().isBlank()) {
 			log.error(VALIDATION_ERROR_PREFIX + "название фильма не может быть пустым");
 			throw new ValidationException("Название фильма не может быть пустым");
@@ -147,6 +132,5 @@ public class FilmService {
 			log.error(VALIDATION_ERROR_PREFIX + "продолжительность фильма должна быть положительным числом");
 			throw new ValidationException("Продолжительность фильма должна быть положительным числом");
 		}
-		log.trace("Валидация фильма пройдена успешно");
 	}
 }
