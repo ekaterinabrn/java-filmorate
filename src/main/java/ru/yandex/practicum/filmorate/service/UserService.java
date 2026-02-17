@@ -14,8 +14,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-//сервис для работы с пользователями
-
+/**
+ * Сервис для работы с пользователями
+ */
 @Slf4j
 @Service
 public class UserService {
@@ -31,8 +32,12 @@ public class UserService {
 		this.userStorage = userStorage;
 	}
 
-	//создать нового пользователя
-
+	/**
+	 * Создать нового пользователя
+	 *
+	 * @param user пользователь для создания
+	 * @return созданный пользователь с присвоенным id
+	 */
 	public User createUser(User user) {
 		log.debug("Начинаем создание пользователя с логином: {}", user.getLogin());
 		validateUser(user);
@@ -45,8 +50,12 @@ public class UserService {
 		return createdUser;
 	}
 
-	//обновить существующего пользователя
-
+	/**
+	 * Обновить существующего пользователя
+	 *
+	 * @param user пользователь для обновления
+	 * @return обновленный пользователь
+	 */
 	public User updateUser(User user) {
 		log.debug("Начинаем обновление пользователя с id: {}", user.getId());
 		validateUser(user);
@@ -63,7 +72,12 @@ public class UserService {
 		return updatedUser;
 	}
 
-
+	/**
+	 * Получить пользователя по идентификатору
+	 *
+	 * @param id идентификатор пользователя
+	 * @return найденный пользователь
+	 */
 	public User getUserById(Integer id) {
 		User user = userStorage.getUserById(id);
 		if (user == null) {
@@ -73,15 +87,22 @@ public class UserService {
 		return user;
 	}
 
-	// список всех пользователей
-
+	/**
+	 * Список всех пользователей
+	 *
+	 * @return список всех пользователей
+	 */
 	public List<User> getAllUsers() {
 		log.debug("Получаем список всех пользователей");
 		return userStorage.getAllUsers();
 	}
 
-	//добавить пользователя в друзья другому пользователю
-
+	/**
+	 * Добавить пользователя в друзья другому пользователю
+	 *
+	 * @param userId идентификатор пользователя
+	 * @param friendId идентификатор друга
+	 */
 	public void addFriend(Integer userId, Integer friendId) {
 		log.debug("Начинаем добавление в друзья: пользователь {} добавляет пользователя {}", userId, friendId);
 		User user = getUserById(userId);
@@ -90,8 +111,12 @@ public class UserService {
 		friend.getFriends().add(userId.longValue());
 	}
 
-	//удалить пользователя из друзей другого пользователя
-
+	/**
+	 * Удалить пользователя из друзей другого пользователя
+	 *
+	 * @param userId идентификатор пользователя
+	 * @param friendId идентификатор друга
+	 */
 	public void removeFriend(Integer userId, Integer friendId) {
 		log.debug("Начинаем удаление из друзей: пользователь {} удаляет пользователя {}", userId, friendId);
 		User user = getUserById(userId);
@@ -100,8 +125,12 @@ public class UserService {
 		friend.getFriends().remove(userId.longValue());
 	}
 
-	//список друзей пользователя
-
+	/**
+	 * Список друзей пользователя
+	 *
+	 * @param userId идентификатор пользователя
+	 * @return список друзей пользователя
+	 */
 	public List<User> getFriends(Integer userId) {
 		log.debug("Получаем список друзей пользователя с id: {}", userId);
 		User user = getUserById(userId);
@@ -112,8 +141,13 @@ public class UserService {
 		return friends;
 	}
 
-	//список общих друзей двух пользователей
-
+	/**
+	 * Список общих друзей двух пользователей
+	 *
+	 * @param userId идентификатор первого пользователя
+	 * @param otherId идентификатор второго пользователя
+	 * @return список общих друзей
+	 */
 	public List<User> getCommonFriends(Integer userId, Integer otherId) {
 		log.debug("Начинаем поиск общих друзей пользователей {} и {}", userId, otherId);
 		User user = getUserById(userId);
@@ -122,7 +156,6 @@ public class UserService {
 		Set<Long> userFriends = user.getFriends();
 		Set<Long> otherFriends = other.getFriends();
 
-		// находим пересечение множеств друзей
 		Set<Long> commonFriendIds = userFriends.stream()
 				.filter(otherFriends::contains)
 				.collect(Collectors.toSet());
@@ -134,8 +167,11 @@ public class UserService {
 		return commonFriends;
 	}
 
-	//валидация данных пользователя
-
+	/**
+	 * Валидация данных пользователя
+	 *
+	 * @param user пользователь для валидации
+	 */
 	private void validateUser(User user) {
 		if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
 			log.error(VALIDATION_ERROR_PREFIX + "email не может быть пустым и должен содержать символ @");

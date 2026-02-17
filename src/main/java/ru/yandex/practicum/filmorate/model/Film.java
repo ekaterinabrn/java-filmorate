@@ -14,6 +14,6 @@ public class Film {
 	private String description;
 	private LocalDate releaseDate;
 	private Integer duration;
-	// множество id пользователей, поставивших лайк фильму
+	/** Множество id пользователей, поставивших лайк фильму */
 	private Set<Long> likes = new HashSet<>();
 }

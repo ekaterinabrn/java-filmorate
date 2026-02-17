@@ -26,7 +26,12 @@ public class FilmController {
 		this.filmService = filmService;
 	}
 
-	//создать новый фильм
+	/**
+	 * Создать новый фильм
+	 *
+	 * @param film фильм для создания
+	 * @return созданный фильм
+	 */
 	@PostMapping
 	public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
 		log.info("Получен запрос на создание фильма: {}", film.getName());
@@ -35,7 +40,12 @@ public class FilmController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
 	}
 
-	//обновить  фильм
+	/**
+	 * Обновить фильм
+	 *
+	 * @param film фильм для обновления
+	 * @return обновленный фильм
+	 */
 	@PutMapping
 	public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
 		log.info("Получен запрос на обновление фильма с id: {}", film.getId());
@@ -44,22 +54,36 @@ public class FilmController {
 		return ResponseEntity.ok(updatedFilm);
 	}
 
-	//список всех фильмов
+	/**
+	 * Список всех фильмов
+	 *
+	 * @return список всех фильмов
+	 */
 	@GetMapping
 	public ResponseEntity<List<Film>> getAllFilms() {
 		log.info("Получен запрос на получение всех фильмов");
 		return ResponseEntity.ok(filmService.getAllFilms());
 	}
 
-	//фильм по его идентификатору
-
+	/**
+	 * Фильм по его идентификатору
+	 *
+	 * @param id идентификатор фильма
+	 * @return найденный фильм
+	 */
 	@GetMapping("/{id}")
 	public ResponseEntity<Film> getFilmById(@PathVariable Integer id) {
 		log.info("Получен запрос на получение фильма с id: {}", id);
 		return ResponseEntity.ok(filmService.getFilmById(id));
 	}
 
-	//добавтть лайк фильму от пользователя
+	/**
+	 * Добавить лайк фильму от пользователя
+	 *
+	 * @param id идентификатор фильма
+	 * @param userId идентификатор пользователя
+	 * @return пустой ответ
+	 */
 	@PutMapping("/{id}/like/{userId}")
 	public ResponseEntity<Void> addLike(@PathVariable Integer id, @PathVariable Integer userId) {
 		log.info("Получен запрос на добавление лайка: пользователь {} ставит лайк фильму {}", userId, id);
@@ -67,8 +91,13 @@ public class FilmController {
 		return ResponseEntity.ok().build();
 	}
 
-	//удалить лайк фильма от пользователя
-
+	/**
+	 * Удалить лайк фильма от пользователя
+	 *
+	 * @param id идентификатор фильма
+	 * @param userId идентификатор пользователя
+	 * @return пустой ответ
+	 */
 	@DeleteMapping("/{id}/like/{userId}")
 	public ResponseEntity<Void> removeLike(@PathVariable Integer id, @PathVariable Integer userId) {
 		log.info("Получен запрос на удаление лайка: пользователь {} удаляет лайк фильму {}", userId, id);
@@ -76,7 +105,12 @@ public class FilmController {
 		return ResponseEntity.ok().build();
 	}
 
-	//список самых популярных фильмов по количеству лайков
+	/**
+	 * Список самых популярных фильмов по количеству лайков
+	 *
+	 * @param count количество фильмов для возврата (если null, возвращается 10)
+	 * @return список популярных фильмов
+	 */
 	@GetMapping("/popular")
 	public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(required = false) Integer count) {
 		log.info("Получен запрос на получение популярных фильмов, количество: {}", count != null ? count : DEFAULT_POPULAR_FILMS_LIMIT);

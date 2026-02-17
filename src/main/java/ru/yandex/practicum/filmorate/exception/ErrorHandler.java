@@ -17,8 +17,12 @@ public class ErrorHandler {
 	public static final String NOT_FOUND_ERROR = "Объект не найден";
 	public static final String INTERNAL_ERROR = "Внутренняя ошибка сервера";
 
-	// возвращает код 400 (Bad Request)
-
+	/**
+	 * Возвращает код 400 (Bad Request)
+	 *
+	 * @param e исключение валидации
+	 * @return ответ с ошибкой валидации
+	 */
 	@ExceptionHandler(ValidationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public Map<String, String> handleValidationException(ValidationException e) {
@@ -26,8 +30,12 @@ public class ErrorHandler {
 		return Map.of("error", VALIDATION_ERROR, "message", e.getMessage());
 	}
 
-	//возвращает код 404 (Not Found)
-
+	/**
+	 * Возвращает код 404 (Not Found)
+	 *
+	 * @param e исключение "объект не найден"
+	 * @return ответ с ошибкой "объект не найден"
+	 */
 	@ExceptionHandler(NotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public Map<String, String> handleNotFoundException(NotFoundException e) {
@@ -35,8 +43,12 @@ public class ErrorHandler {
 		return Map.of("error", NOT_FOUND_ERROR, "message", e.getMessage());
 	}
 
-	//возвращает код 500 (Internal Server Error)
-
+	/**
+	 * Возвращает код 500 (Internal Server Error)
+	 *
+	 * @param e исключение
+	 * @return ответ с внутренней ошибкой сервера
+	 */
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public Map<String, String> handleException(Exception e) {

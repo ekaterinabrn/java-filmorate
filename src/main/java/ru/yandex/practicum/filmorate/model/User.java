@@ -14,6 +14,6 @@ public class User {
 	private String login;
 	private String name;
 	private LocalDate birthday;
-	// Чтобы обеспечить уникальность значения (нельзя добавить одного человека в друзья дважды)
+	/** Множество id друзей пользователя для обеспечения уникальности (нельзя добавить одного человека в друзья дважды) */
 	private Set<Long> friends = new HashSet<>();
 }

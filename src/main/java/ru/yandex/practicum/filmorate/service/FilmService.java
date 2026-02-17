@@ -14,8 +14,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//сервис для работы с фильмами
-
+/**
+ * Сервис для работы с фильмами
+ */
 @Slf4j
 @Service
 public class FilmService {
@@ -41,8 +42,12 @@ public class FilmService {
 		this.userStorage = userStorage;
 	}
 
-	//создать новый фильм
-
+	/**
+	 * Создать новый фильм
+	 *
+	 * @param film фильм для создания
+	 * @return созданный фильм с присвоенным id
+	 */
 	public Film createFilm(Film film) {
 		log.debug("Создаем фильм: {}", film.getName());
 		validateFilm(film);
@@ -51,8 +56,12 @@ public class FilmService {
 		return createdFilm;
 	}
 
-	//обновить  фильм
-
+	/**
+	 * Обновить фильм
+	 *
+	 * @param film фильм для обновления
+	 * @return обновленный фильм
+	 */
 	public Film updateFilm(Film film) {
 		log.debug("Обновляем фильм с id: {}", film.getId());
 		validateFilm(film);
@@ -65,8 +74,12 @@ public class FilmService {
 		return updatedFilm;
 	}
 
-	//получить фильм по идентификатору
-
+	/**
+	 * Получить фильм по идентификатору
+	 *
+	 * @param id идентификатор фильма
+	 * @return найденный фильм
+	 */
 	public Film getFilmById(Integer id) {
 		Film film = filmStorage.getFilmById(id);
 		if (film == null) {
@@ -76,15 +89,22 @@ public class FilmService {
 		return film;
 	}
 
-	//список всех фильмов
-
+	/**
+	 * Список всех фильмов
+	 *
+	 * @return список всех фильмов
+	 */
 	public List<Film> getAllFilms() {
 		log.debug("Получаем список всех фильмов");
 		return filmStorage.getAllFilms();
 	}
 
-	//добавлить лайк фильму от пользователя
-
+	/**
+	 * Добавить лайк фильму от пользователя
+	 *
+	 * @param filmId идентификатор фильма
+	 * @param userId идентификатор пользователя
+	 */
 	public void addLike(Integer filmId, Integer userId) {
 		log.debug("Добавляем лайк: пользователь {} ставит лайк фильму {}", userId, filmId);
 		Film film = getFilmById(filmId);
@@ -95,8 +115,12 @@ public class FilmService {
 		film.getLikes().add(userId.longValue());
 	}
 
-	//удалить лайк фильма
-
+	/**
+	 * Удалить лайк фильма
+	 *
+	 * @param filmId идентификатор фильма
+	 * @param userId идентификатор пользователя
+	 */
 	public void removeLike(Integer filmId, Integer userId) {
 		log.debug("Удаляем лайк: пользователь {} удаляет лайк фильму {}", userId, filmId);
 		Film film = getFilmById(filmId);
@@ -107,8 +131,12 @@ public class FilmService {
 		film.getLikes().remove(userId.longValue());
 	}
 
-	//список самых популярных фильмов по количеству лайков
-
+	/**
+	 * Список самых популярных фильмов по количеству лайков
+	 *
+	 * @param count количество фильмов для возврата (если null или <= 0, возвращается 10)
+	 * @return список популярных фильмов
+	 */
 	public List<Film> getPopularFilms(Integer count) {
 		int limit = (count == null || count <= MIN_DURATION_VALUE) ? DEFAULT_POPULAR_FILMS_LIMIT : count;
 		log.debug("Получаем список популярных фильмов: {}", limit);
@@ -119,8 +147,11 @@ public class FilmService {
 		return popularFilms;
 	}
 
-	//валидация данных фильма
-
+	/**
+	 * Валидация данных фильма
+	 *
+	 * @param film фильм для валидации
+	 */
 	private void validateFilm(Film film) {
 		if (film.getName() == null || film.getName().isBlank()) {
 			log.error(VALIDATION_ERROR_PREFIX + "название фильма не может быть пустым");
