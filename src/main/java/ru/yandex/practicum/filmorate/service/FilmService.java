@@ -29,6 +29,8 @@ public class FilmService {
 	private static final String FILM_NOT_FOUND = "Фильм с id {} не найден";
 	private static final String FILM_NOT_FOUND_MESSAGE = "Фильм с id ";
 	private static final String USER_NOT_FOUND_MESSAGE = "Пользователь с id ";
+	private static final String MPA_NOT_FOUND_MESSAGE = "Рейтинг MPA с id ";
+	private static final String GENRE_NOT_FOUND_MESSAGE = "Жанр с id ";
 
 	private static final int DEFAULT_POPULAR_FILMS_LIMIT = 10;
 	private static final int MAX_FILM_DESCRIPTION_LENGTH = 200;
@@ -210,6 +212,25 @@ public class FilmService {
 		if (film.getDuration() == null || film.getDuration() <= MIN_DURATION_VALUE) {
 			log.error(VALIDATION_ERROR_PREFIX + "продолжительность фильма должна быть положительным числом");
 			throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+		}
+		validateMpaAndGenresExist(film);
+	}
+
+	/**
+	 * Проверяет существование MPA и жанров в БД. При отсутствии — 404.
+	 */
+	private void validateMpaAndGenresExist(Film film) {
+		if (film.getMpaId() != null && mpaRepository.findById(film.getMpaId()).isEmpty()) {
+			log.warn("Рейтинг MPA с id {} не найден", film.getMpaId());
+			throw new NotFoundException(MPA_NOT_FOUND_MESSAGE + film.getMpaId() + " не найден");
+		}
+		if (film.getGenreIds() != null) {
+			for (Integer genreId : film.getGenreIds()) {
+				if (genreRepository.findById(genreId).isEmpty()) {
+					log.warn("Жанр с id {} не найден", genreId);
+					throw new NotFoundException(GENRE_NOT_FOUND_MESSAGE + genreId + " не найден");
+				}
+			}
 		}
 	}
 }
