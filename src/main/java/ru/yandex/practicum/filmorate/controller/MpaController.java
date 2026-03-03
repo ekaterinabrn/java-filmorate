@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -43,8 +44,10 @@ public class MpaController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Mpa> getMpaById(@PathVariable Integer id) {
 		log.info("Получен запрос на получение рейтинга MPA с id: {}", id);
-		return mpaRepository.findById(id)
-				.map(ResponseEntity::ok)
-				.orElseThrow(() -> new NotFoundException("Рейтинг MPA с id " + id + " не найден"));
+		Optional<Mpa> mpaOpt = mpaRepository.findById(id);
+		if (mpaOpt.isEmpty()) {
+			throw new NotFoundException("Рейтинг MPA с id " + id + " не найден");
+		}
+		return ResponseEntity.ok(mpaOpt.get());
 	}
 }

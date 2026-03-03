@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -43,8 +44,10 @@ public class GenreController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Genre> getGenreById(@PathVariable Integer id) {
 		log.info("Получен запрос на получение жанра с id: {}", id);
-		return genreRepository.findById(id)
-				.map(ResponseEntity::ok)
-				.orElseThrow(() -> new NotFoundException("Жанр с id " + id + " не найден"));
+		Optional<Genre> genreOpt = genreRepository.findById(id);
+		if (genreOpt.isEmpty()) {
+			throw new NotFoundException("Жанр с id " + id + " не найден");
+		}
+		return ResponseEntity.ok(genreOpt.get());
 	}
 }
