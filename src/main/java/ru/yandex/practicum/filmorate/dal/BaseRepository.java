@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,17 +14,13 @@ import java.util.Optional;
 
 /**
  * Базовый репозиторий для работы с БД через JdbcTemplate.
- * Содержит общую логику  insert, update, delete.
+ * Содержит общую логику insert, update, delete.
  */
+@RequiredArgsConstructor
 public abstract class BaseRepository<T> {
 
 	protected final JdbcTemplate jdbc;
 	protected final RowMapper<T> mapper;
-
-	protected BaseRepository(JdbcTemplate jdbc, RowMapper<T> mapper) {
-		this.jdbc = jdbc;
-		this.mapper = mapper;
-	}
 
 	protected Optional<T> findOne(String query, Object... params) {
 		try {
@@ -38,6 +35,7 @@ public abstract class BaseRepository<T> {
 		return jdbc.query(query, mapper, params);
 	}
 
+
 	protected long insert(String query, Object... params) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbc.update(connection -> {
@@ -51,7 +49,7 @@ public abstract class BaseRepository<T> {
 		if (key != null) {
 			return key.longValue();
 		}
-		throw new IllegalStateException("Не удалось сохранить данные:  ключ отсутствует");
+		throw new IllegalStateException("Не удалось сохранить данные: ключ отсутствует");
 	}
 
 	protected void update(String query, Object... params) {
