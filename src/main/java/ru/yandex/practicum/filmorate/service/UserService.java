@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -28,7 +29,7 @@ public class UserService {
 
 
 	@Autowired
-	public UserService(UserStorage userStorage) {
+	public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
 		this.userStorage = userStorage;
 	}
 
@@ -98,73 +99,49 @@ public class UserService {
 	}
 
 	/**
-	 * Добавить пользователя в друзья другому пользователю
-	 *
-	 * @param userId идентификатор пользователя
-	 * @param friendId идентификатор друга
+	 * Добавить пользователя в друзья (односторонняя заявка: friendId попадает в список друзей userId).
 	 */
 	public void addFriend(Integer userId, Integer friendId) {
 		log.debug("Начинаем добавление в друзья: пользователь {} добавляет пользователя {}", userId, friendId);
-		User user = getUserById(userId);
-		User friend = getUserById(friendId);
-		user.getFriends().add(friendId.longValue());
-		friend.getFriends().add(userId.longValue());
+		getUserById(userId);
+		getUserById(friendId);
+		userStorage.addFriend(userId, friendId);
 	}
 
 	/**
-	 * Удалить пользователя из друзей другого пользователя
-	 *
-	 * @param userId идентификатор пользователя
-	 * @param friendId идентификатор друга
+	 * Удалить пользователя из друзей.
 	 */
 	public void removeFriend(Integer userId, Integer friendId) {
 		log.debug("Начинаем удаление из друзей: пользователь {} удаляет пользователя {}", userId, friendId);
-		User user = getUserById(userId);
-		User friend = getUserById(friendId);
-		user.getFriends().remove(friendId.longValue());
-		friend.getFriends().remove(userId.longValue());
+		getUserById(userId);
+		getUserById(friendId);
+		userStorage.removeFriend(userId, friendId);
 	}
 
 	/**
-	 * Список друзей пользователя
-	 *
-	 * @param userId идентификатор пользователя
-	 * @return список друзей пользователя
+	 * Список друзей пользователя.
 	 */
 	public List<User> getFriends(Integer userId) {
 		log.debug("Получаем список друзей пользователя с id: {}", userId);
-		User user = getUserById(userId);
-		List<User> friends = new ArrayList<>();
-		for (Long friendId : user.getFriends()) {
-			friends.add(getUserById(friendId.intValue()));
-		}
-		return friends;
+		getUserById(userId);
+		return userStorage.getFriends(userId);
 	}
 
 	/**
-	 * Список общих друзей двух пользователей
-	 *
-	 * @param userId идентификатор первого пользователя
-	 * @param otherId идентификатор второго пользователя
-	 * @return список общих друзей
+	 * Список общих друзей двух пользователей.
 	 */
 	public List<User> getCommonFriends(Integer userId, Integer otherId) {
 		log.debug("Начинаем поиск общих друзей пользователей {} и {}", userId, otherId);
 		User user = getUserById(userId);
 		User other = getUserById(otherId);
-
-		Set<Long> userFriends = user.getFriends();
-		Set<Long> otherFriends = other.getFriends();
-
-		Set<Long> commonFriendIds = userFriends.stream()
-				.filter(otherFriends::contains)
-				.collect(Collectors.toSet());
-
-		List<User> commonFriends = new ArrayList<>();
-		for (Long friendId : commonFriendIds) {
-			commonFriends.add(getUserById(friendId.intValue()));
+		Set<Long> userFriendIds = user.getFriends();
+		Set<Long> otherFriendIds = other.getFriends();
+		Set<Long> commonIds = userFriendIds.stream().filter(otherFriendIds::contains).collect(Collectors.toSet());
+		List<User> result = new ArrayList<>();
+		for (Long fid : commonIds) {
+			result.add(getUserById(fid.intValue()));
 		}
-		return commonFriends;
+		return result;
 	}
 
 	/**

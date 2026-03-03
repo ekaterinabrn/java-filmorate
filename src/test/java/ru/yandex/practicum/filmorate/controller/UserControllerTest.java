@@ -13,22 +13,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
 
-	private UserController userController;
-	private User validUser;
 	private static final String USER_LOGIN = "dolore";
 	private static final String USER_NAME = "Nick Name";
 	private static final String USER_EMAIL = "mail@mail.ru";
+	private static final LocalDate USER_BIRTHDAY = LocalDate.of(1990, 8, 20);
+
+	private static final String EMAIL_INVALID_NO_AT = "invalidemail.ru";
+	private static final String LOGIN_WITH_SPACES = "test login";
+
+	private UserController userController;
+	private User validUser;
 
 	@BeforeEach
 	void setUp() {
-		//создаем хранилище и сервис до создания контроллерв
 		UserService userService = new UserService(new InMemoryUserStorage());
 		userController = new UserController(userService);
 		validUser = new User();
 		validUser.setEmail(USER_EMAIL);
 		validUser.setLogin(USER_LOGIN);
 		validUser.setName(USER_NAME);
-		validUser.setBirthday(LocalDate.of(1990, 8, 20));
+		validUser.setBirthday(USER_BIRTHDAY);
 	}
 
 	@Test
@@ -53,7 +57,7 @@ class UserControllerTest {
 
 	@Test
 	void createUser_EmailWithoutAtSymbolNegativeTest() {
-		validUser.setEmail("invalidemail.ru");
+		validUser.setEmail(EMAIL_INVALID_NO_AT);
 		assertThrows(ValidationException.class, () -> userController.createUser(validUser));
 	}
 
@@ -71,7 +75,7 @@ class UserControllerTest {
 
 	@Test
 	void createUser_LoginContainingSpacesNegativeTest() {
-		validUser.setLogin("test login");
+		validUser.setLogin(LOGIN_WITH_SPACES);
 		assertThrows(ValidationException.class, () -> userController.createUser(validUser));
 	}
 
