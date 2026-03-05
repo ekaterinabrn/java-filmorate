@@ -4,8 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.dal.GenreRepository;
 import ru.yandex.practicum.filmorate.dal.MpaRepository;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.mapper.GenreMapper;
+import ru.yandex.practicum.filmorate.mapper.MpaMapper;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -35,7 +38,7 @@ class FilmControllerTest {
 	private static final int DURATION_ZERO = 0;
 
 	private FilmController filmController;
-	private Film validFilm;
+	private FilmDto validFilmDto;
 
 	@BeforeEach
 	void setUp() {
@@ -50,17 +53,18 @@ class FilmControllerTest {
 				mpaRepository,
 				genreRepository
 		);
-		filmController = new FilmController(filmService);
-		validFilm = new Film();
-		validFilm.setName(FILM_NAME);
-		validFilm.setDescription(FILM_DESCRIPTION);
-		validFilm.setReleaseDate(RELEASE_DATE_VALID);
-		validFilm.setDuration(DURATION_VALID);
+		FilmMapper filmMapper = new FilmMapper(new MpaMapper(), new GenreMapper());
+		filmController = new FilmController(filmService, filmMapper);
+		validFilmDto = new FilmDto();
+		validFilmDto.setName(FILM_NAME);
+		validFilmDto.setDescription(FILM_DESCRIPTION);
+		validFilmDto.setReleaseDate(RELEASE_DATE_VALID);
+		validFilmDto.setDuration(DURATION_VALID);
 	}
 
 	@Test
 	void createFilmPositiveTest() {
-		Film result = filmController.createFilm(validFilm).getBody();
+		FilmDto result = filmController.createFilm(validFilmDto).getBody();
 		assertNotNull(result);
 		assertNotNull(result.getId());
 		assertEquals(FILM_NAME, result.getName());
@@ -68,69 +72,69 @@ class FilmControllerTest {
 
 	@Test
 	void createFilm_EmptyNameNegativeTest() {
-		validFilm.setName("");
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setName("");
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_NullNameTestNegativeTest() {
-		validFilm.setName(null);
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setName(null);
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_LongDescriptionTest() {
-		validFilm.setDescription(DESCRIPTION_OVER_200_CHARS);
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setDescription(DESCRIPTION_OVER_200_CHARS);
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_Description200CharsTest() {
-		validFilm.setDescription("a".repeat(DESCRIPTION_MAX_LENGTH));
-		Film result = filmController.createFilm(validFilm).getBody();
+		validFilmDto.setDescription("a".repeat(DESCRIPTION_MAX_LENGTH));
+		FilmDto result = filmController.createFilm(validFilmDto).getBody();
 		assertNotNull(result);
 	}
 
 	@Test
 	void createFilm_ReleaseDateBeforeMinDateTest() {
-		validFilm.setReleaseDate(RELEASE_DATE_BEFORE_MIN);
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setReleaseDate(RELEASE_DATE_BEFORE_MIN);
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_ReleaseDateMinDatePositiveTest() {
-		validFilm.setReleaseDate(RELEASE_DATE_MIN);
-		Film result = filmController.createFilm(validFilm).getBody();
+		validFilmDto.setReleaseDate(RELEASE_DATE_MIN);
+		FilmDto result = filmController.createFilm(validFilmDto).getBody();
 		assertNotNull(result);
 	}
 
 	@Test
 	void createFilm_WithNullReleaseDateNegativeTest() {
-		validFilm.setReleaseDate(null);
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setReleaseDate(null);
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_NegativeDurationNegativeTest() {
-		validFilm.setDuration(DURATION_NEGATIVE);
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setDuration(DURATION_NEGATIVE);
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_ZeroDurationNegativeTest() {
-		validFilm.setDuration(DURATION_ZERO);
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setDuration(DURATION_ZERO);
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_NullDurationNegativeTest() {
-		validFilm.setDuration(null);
-		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilm));
+		validFilmDto.setDuration(null);
+		assertThrows(ValidationException.class, () -> filmController.createFilm(validFilmDto));
 	}
 
 	@Test
 	void createFilm_EmptyRequestNegativeTest() {
-		Film emptyFilm = new Film();
-		assertThrows(ValidationException.class, () -> filmController.createFilm(emptyFilm));
+		FilmDto emptyFilmDto = new FilmDto();
+		assertThrows(ValidationException.class, () -> filmController.createFilm(emptyFilmDto));
 	}
 }

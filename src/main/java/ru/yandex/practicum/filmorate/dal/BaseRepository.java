@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Базовый репозиторий для работы с БД через JdbcTemplate.
- * Содержит общую логику insert, update, delete.
+ * базовый репозиторий для работы с БД через JdbcTemplate.
+ * содержит общую логику insert, update, delete.
  */
 @RequiredArgsConstructor
 public abstract class BaseRepository<T> {

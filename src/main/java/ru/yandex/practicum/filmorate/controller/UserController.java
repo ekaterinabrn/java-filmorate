@@ -1,130 +1,84 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-
-@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-	private final UserService userService;
 
+	private final UserService userService;
+	private final UserMapper userMapper;
 
 	@Autowired
-	public UserController(UserService userService) {
+	public UserController(UserService userService, UserMapper userMapper) {
 		this.userService = userService;
+		this.userMapper = userMapper;
 	}
 
-	/**
-	 * Создать нового пользователя
-	 *
-	 * @param user пользователь для создания
-	 * @return созданный пользователь
-	 */
 	@PostMapping
-	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-		log.info("Получен запрос на создание пользователя с логином: {}, именем: {}", user.getLogin(), user.getName());
-		User createdUser = userService.createUser(user);
-		log.info("Пользователь создан id: {}", createdUser.getId());
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+		User user = userMapper.toEntity(userDto);
+		User created = userService.createUser(user);
+		return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toDto(created));
 	}
 
-	/**
-	 * Обновить пользователя
-	 *
-	 * @param user пользователь для обновления
-	 * @return обновленный пользователь
-	 */
 	@PutMapping
-	public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
-		log.info("Получен запрос на обновление пользователя с id: {}", user.getId());
-		User updatedUser = userService.updateUser(user);
-		log.info("Пользователь с id {} успешно обновлен", updatedUser.getId());
-		return ResponseEntity.ok(updatedUser);
+	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto) {
+		User user = userMapper.toEntity(userDto);
+		User updated = userService.updateUser(user);
+		return ResponseEntity.ok(userMapper.toDto(updated));
 	}
 
-	/**
-	 * Список всех пользователей
-	 *
-	 * @return список всех пользователей
-	 */
 	@GetMapping
-	public ResponseEntity<List<User>> getAllUsers() {
-		log.info("Получен запрос на получение списка всех пользователей");
-		return ResponseEntity.ok(userService.getAllUsers());
+	public ResponseEntity<List<UserDto>> getAllUsers() {
+		return ResponseEntity.ok(
+				userService.getAllUsers().stream()
+						.map(userMapper::toDto)
+						.collect(Collectors.toList()));
 	}
 
-	/**
-	 * Пользователь по его идентификатору
-	 *
-	 * @param id идентификатор пользователя
-	 * @return найденный пользователь
-	 */
 	@GetMapping("/{id}")
-	public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-		log.info("Получен запрос на получение пользователя с id: {}", id);
-		return ResponseEntity.ok(userService.getUserById(id));
+	public ResponseEntity<UserDto> getUserById(@PathVariable Integer id) {
+		User user = userService.getUserById(id);
+		return ResponseEntity.ok(userMapper.toDto(user));
 	}
 
-	/**
-	 * Добавить пользователя в друзья другому пользователю
-	 *
-	 * @param id идентификатор пользователя
-	 * @param friendId идентификатор друга
-	 * @return пустой ответ
-	 */
 	@PutMapping("/{id}/friends/{friendId}")
 	public ResponseEntity<Void> addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
-		log.info("Получен запрос на добавление в друзья: пользователь {} добавляет пользователя {}", id, friendId);
 		userService.addFriend(id, friendId);
 		return ResponseEntity.ok().build();
 	}
 
-	/**
-	 * Удалить пользователя из друзей другого пользователя
-	 *
-	 * @param id идентификатор пользователя
-	 * @param friendId идентификатор друга
-	 * @return пустой ответ
-	 */
 	@DeleteMapping("/{id}/friends/{friendId}")
 	public ResponseEntity<Void> removeFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
-		log.info("Получен запрос на удаление из друзей: пользователь {} удаляет пользователя {}", id, friendId);
 		userService.removeFriend(id, friendId);
 		return ResponseEntity.ok().build();
 	}
 
-	/**
-	 * Список друзей пользователя
-	 *
-	 * @param id идентификатор пользователя
-	 * @return список друзей пользователя
-	 */
 	@GetMapping("/{id}/friends")
-	public ResponseEntity<List<User>> getFriends(@PathVariable Integer id) {
-		log.info("Получен запрос на получение списка друзей пользователя с id: {}", id);
-		return ResponseEntity.ok(userService.getFriends(id));
+	public ResponseEntity<List<UserDto>> getFriends(@PathVariable Integer id) {
+		return ResponseEntity.ok(
+				userService.getFriends(id).stream()
+						.map(userMapper::toDto)
+						.collect(Collectors.toList()));
 	}
 
-	/**
-	 * Список общих друзей пользователей
-	 *
-	 * @param id идентификатор первого пользователя
-	 * @param otherId идентификатор второго пользователя
-	 * @return список общих друзей
-	 */
 	@GetMapping("/{id}/friends/common/{otherId}")
-	public ResponseEntity<List<User>> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
-		log.info("Получен запрос на получение общих друзей пользователей {} и {}", id, otherId);
-		return ResponseEntity.ok(userService.getCommonFriends(id, otherId));
+	public ResponseEntity<List<UserDto>> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+		return ResponseEntity.ok(
+				userService.getCommonFriends(id, otherId).stream()
+						.map(userMapper::toDto)
+						.collect(Collectors.toList()));
 	}
 }
