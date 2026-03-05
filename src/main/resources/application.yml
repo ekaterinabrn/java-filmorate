@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:~/filmorate
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+  h2:
+    console:
+      enabled: true
+
+logbook:     # добавила без этого logbook хватал тело HTTP-потока и не могла войти в консоль бд
+  exclude:
+    - /h2-console
+    - /h2-console/**
+
+logging:
+  level:
+    org.zalando.logbook: TRACE
+    ru.yandex.practicum.filmorate: DEBUG
